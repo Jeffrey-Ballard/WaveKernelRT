@@ -52,8 +52,10 @@ public export tests when applicable.
   consequences.
 - Retain the BSD 3-Clause license notices when redistributing source.
 
-The project currently has no automated continuous-integration gate, so local
-validation is required before a change is submitted.
+GitHub Actions runs the test suite, checks minimum supported dependencies,
+builds the documentation, and verifies offline installation for pushes and
+pull requests. Run the relevant validation commands locally before submitting
+a change so problems can be caught before CI.
 
 ## Development documentation
 
