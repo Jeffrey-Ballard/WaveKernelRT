@@ -1,5 +1,7 @@
 # WaveKernelRT
 
+[![CI](https://github.com/Jeffrey-Ballard/WaveKernelRT/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Jeffrey-Ballard/WaveKernelRT/actions/workflows/ci.yml)
+
 WaveKernelRT is an experimental Python framework for acoustic-array analysis and
 streaming signal-processing pipelines. It brings array geometry, steering,
 shading, beamforming, spectral processing, custom binary file I/O, and
@@ -223,16 +225,27 @@ describes supported dependency floors, metadata ownership, and reproducibility.
 
 ## Roadmap
 
-Near-term work is focused on:
+Near-term work is focused on performance and execution:
 
-- Bringing the README, tutorials, and API documentation in line with the code
+- Profile representative end-to-end pipelines and establish CPU and GPU
+  performance baselines
+- Add optional C++ backends for performance-critical beamforming and
+  noise-background-estimation kernels while retaining Python reference
+  implementations
+- Evaluate CUDA acceleration for those kernels where measured workloads and
+  data-transfer costs justify GPU execution
+- Design bounded asynchronous pipeline execution so upstream FFT production
+  can continue while downstream beamforming, background estimation, and
+  bearing-time-record (BTR) writing process queued blocks, with explicit
+  ordering and backpressure
+
+As well as:
 - Defining and testing the supported public API
 - Expanding unit and integration test coverage
-- Maintaining file-format compatibility and migration policy
 - Improving validation, portability, and reproducibility
 
-Longer-term goals include live audio input/output and selected C++ or GPU
-acceleration where profiling demonstrates a need.
+Longer-term goals also include live audio input/output and additional
+accelerated backends where profiling demonstrates a need.
 
 ## Contributing
 
