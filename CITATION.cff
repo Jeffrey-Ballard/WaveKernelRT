@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: >-
+  If WaveKernelRT contributes to your analysis, please cite the software and
+  acknowledge its use in resulting publications, technical reports, and
+  presentations.
+title: WaveKernelRT
+type: software
+authors:
+  - family-names: Ballard
+    given-names: Jeffrey
+version: 0.1.0
+repository-code: https://github.com/Jeffrey-Ballard/WaveKernelRT
+url: https://github.com/Jeffrey-Ballard/WaveKernelRT
+license: BSD-3-Clause
+keywords:
+  - acoustic arrays
+  - beamforming
+  - signal processing
+  - sonar
+  - Python
