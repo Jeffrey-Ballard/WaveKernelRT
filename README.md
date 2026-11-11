@@ -79,6 +79,81 @@ For systems without Internet access, see the
 repository can prepare a platform-specific transfer bundle containing
 WaveKernelRT and all required dependency wheels.
 
+## Docker
+
+Docker can package WaveKernelRT, Python, and its runtime dependencies into an
+isolated Linux image. Docker Desktop or another compatible container runtime is
+required; the host Python installation is not used.
+
+From the repository root, build the image:
+
+```bash
+docker build --progress=plain --tag wavekernelrt:local .
+```
+
+Create a host output directory and run the default line-array example:
+
+```bash
+mkdir -p docker-results
+docker run --rm \
+  --mount type=bind,source="$PWD/docker-results",target=/results \
+  wavekernelrt:local
+```
+
+On Windows PowerShell, ensure Docker Desktop is using Linux containers and use
+an absolute host path for the bind mount:
+
+```powershell
+New-Item -ItemType Directory -Force docker-results | Out-Null
+$resultsPath = (Resolve-Path docker-results).Path
+
+docker run --rm `
+  --mount "type=bind,source=$resultsPath,target=/results" `
+  wavekernelrt:local
+```
+
+The PowerShell form follows Docker's absolute-source-path requirement but has
+not been exercised as part of this Apple Silicon workflow.
+
+The container generates a 50-element line-array geometry, applies Taylor
+shading, computes conventional-beamforming weight and look sweeps, and writes:
+
+```text
+docker-results/
+|-- simple_line_array.txt
+|-- line_array_geometry.png
+|-- line_array_shading.png
+|-- line_array_weight_sweep.png
+`-- line_array_look_sweep.png
+```
+
+`--rm` removes the container after its process exits. The bind-mounted results
+remain on the host, and `docker-results/` is ignored by Git.
+
+Run the complete discovered test suite inside a fresh container:
+
+```bash
+docker run --rm \
+  wavekernelrt:local \
+  python -m unittest discover -s tests -v
+```
+
+The suite contains targeted unit and small integration tests. In particular, a
+deterministic synthetic-signal test writes a WaveKernelRT `.ts` file, runs the
+TS -> FFT -> PSD pipeline, and verifies FFT-window normalization and recovered
+sinusoid amplitude. Other tests cover focused pipeline stages, file formats,
+beamforming, DMR behavior, shading, steering, and plotting.
+
+The suite does not exhaustively test every possible pipeline-stage ordering,
+configuration combination, full SWellEx-96 workflow, platform, or numerical
+backend. Passing it provides strong regression evidence for the covered paths,
+not proof that every composable pipeline has been validated.
+
+This workflow has been verified with Docker Desktop on Apple Silicon using a
+native Linux ARM64 image. The official Python base also supports Linux AMD64;
+build and test a native image for the architecture used by the deployment
+system rather than treating emulated timing as representative performance.
+
 ## Quick start
 
 The repository includes a small line-array geometry, so the following example

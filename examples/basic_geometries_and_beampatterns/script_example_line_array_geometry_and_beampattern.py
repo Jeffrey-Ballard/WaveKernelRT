@@ -1,4 +1,5 @@
 # General imports
+import argparse
 import numpy as np
 from pathlib import Path
 
@@ -7,6 +8,12 @@ from wavekernelrt.core.shading import Shading
 from wavekernelrt.core.beampattern import BeamPattern
 
 import matplotlib.pyplot as plt
+
+
+parser = argparse.ArgumentParser(description="Generate a line-array geometry and conventional-beamforming plots.")
+parser.add_argument("--output-dir",type=Path,
+    help="directory for the generated geometry and PNG figures; display figures when omitted")
+args = parser.parse_args()
 
 # This script is broken up into 3 sections
 # 1. Create the array geometry
@@ -31,7 +38,12 @@ import matplotlib.pyplot as plt
 # User settings — paths and array parameters
 # ------------------------------------------------------------------
 example_dir = Path(__file__).resolve().parent
-array_file = example_dir / "simple_line_array.txt"
+output_dir = args.output_dir
+
+if output_dir is not None:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+array_file = (output_dir or example_dir) / "simple_line_array.txt"
 
 design_freq = 1000
 soundspeed_ftpers = 5000
@@ -94,6 +106,7 @@ shade = Shading(geom)
 
 # Examples of how to interogate or change the shading
 shade.plot_shading("taylor",geom)
+fig_shading = plt.gcf()
 
 # ------------------------------------------------------------------
 # Calculate and plot the beampattern
@@ -104,14 +117,27 @@ bp = BeamPattern(geom=geom,freq=design_freq)
 # plot the beampattern
 bp.compute_cbf_weight_QNJ(shade.taylor_shading_N)
 
-fig_bp,ax_bp = bp.plot_beampattern_weight_sweep(bp.cbf_weight_QNJ,look_dir_rad_13,freq_display=design_freq)
+fig_weight_sweep,ax_weight_sweep = bp.plot_beampattern_weight_sweep(
+    bp.cbf_weight_QNJ,look_dir_rad_13,freq_display=design_freq)
 
 azimuth_deg_A = np.acos(np.linspace(1,-1,101))*180/np.pi
 elevation_deg_E = 0
-fig_bp,ax_bp = bp.plot_beampattern_look_sweep(bp.cbf_weight_QNJ[:,:,10],azimuth_deg_A,elevation_deg_E,freq_display=design_freq)
+fig_look_sweep,ax_look_sweep = bp.plot_beampattern_look_sweep(
+    bp.cbf_weight_QNJ[:,:,10],azimuth_deg_A,elevation_deg_E,freq_display=design_freq)
 
 
 # ------------------------------------------------------------------
-# Display the figures
+# Save or display the figures
 # ------------------------------------------------------------------
-plt.show()
+if output_dir is None:
+    plt.show()
+else:
+    figures = {
+        "line_array_geometry.png": fig_geom,
+        "line_array_shading.png": fig_shading,
+        "line_array_weight_sweep.png": fig_weight_sweep,
+        "line_array_look_sweep.png": fig_look_sweep}
+    for filename,figure in figures.items():
+        figure.savefig(output_dir / filename)
+
+    print(f"Geometry and figures written to: {output_dir.resolve()}")

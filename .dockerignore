@@ -1,0 +1,40 @@
+# Exclude everything by default.
+**
+
+# Docker build definition.
+!Dockerfile
+!.dockerignore
+
+# Python package metadata.
+!pyproject.toml
+!README.md
+!LICENSE
+
+# Package source, examples, tests, and validation tools.
+!src/
+!src/**
+!examples/
+!examples/**
+!tests/
+!tests/**
+!tools/
+!tools/**
+
+# Exclude generated content within included directories.
+**/__pycache__/
+**/*.py[cod]
+**/*.egg-info/
+**/.DS_Store
+
+# Exclude WaveKernelRT datasets and generated data products.
+**/*.sio
+**/*.ts
+**/*.fft
+**/*.psd
+**/*.bfft
+**/*.bpsd
+**/*.bts
+**/*.btr
+**/*.bfw
+**/*.wng
+**/*.wav
